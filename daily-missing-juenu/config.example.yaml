@@ -1,0 +1,61 @@
+# daily-missing-juenu — example configuration.
+#
+# First-time setup:
+#   cp config.example.yaml config.yaml
+# Then fill in the values below. The real config.yaml is gitignored.
+
+subject:
+  # The person whose fancams we're collecting.
+  name_cn: 李珠珢
+  name_en: Lee Ju-Eun
+  name_ko: 이주은
+
+message:
+  # How many videos to include in each digest.
+  video_count: 3
+
+  # Max age of any video that can make it into the digest. record-sent
+  # refuses anything older than this, even if the LLM tries to include it.
+  # Tune up/down to taste.
+  max_age_days: 3
+
+  # Used verbatim in the message template. {count} and {source} are filled
+  # at render time.
+  intro_template: "今日精選 {count} 支{source}影片："
+
+  # Prefix used when the draft has to fall back to the sender's own DM
+  # (because slack_send_message_draft failed). {recipient} is filled from
+  # slack.recipient.label at render time.
+  fallback_prefix: "【今日珠珢草稿 — 自行決定是否轉發 {recipient}】"
+
+slack:
+  sender:
+    label: YourName          # e.g. Alice
+    user_id: ""              # your own Slack user ID — looks like UXXXXXXXXX
+
+  recipient:
+    label: YourFriend        # e.g. Bob
+    dm_channel: ""           # DM channel ID to the recipient — looks like DXXXXXXXXX
+    # The skill never sends here directly — it only drafts. The sender
+    # hits Send from Slack's Drafts UI.
+
+freshness:
+  # Anchor for the "bigger TikTok video ID = newer" heuristic. Update
+  # roughly every few months so the skill keeps a correct mental model.
+  tiktok_id_anchor: "7610000000000000000"
+  tiktok_id_anchor_date: "2026-03-25"
+
+search:
+  # Watchlist of fan accounts lives in data/fan-accounts.yaml, not here.
+  # These keywords are only used for search-page browsing or WebSearch
+  # fallback.
+  keywords:
+    ko:
+      - 이주은 치어리더
+      - 이주은 직캠
+      - 이주은 뒷캠
+    zh:
+      - 李珠珢 應援
+      - 李珠珢 直拍
+    en:
+      - Lee Ju Eun cheerleader fancam

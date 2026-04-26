@@ -1,0 +1,9 @@
+# Skip runtime data — not useful context for Claude
+daily-missing-juenu/data/state.yaml
+daily-missing-juenu/data/sent-log.yaml
+daily-missing-juenu/data/fan-accounts.yaml
+
+# Skip Python bytecode
+**/__pycache__/
+**/*.py[cod]
+**/.pytest_cache/

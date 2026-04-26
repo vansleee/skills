@@ -1,0 +1,19 @@
+# --- user / instance-specific data (stays local) ---
+config.yaml
+data/sent-log.yaml
+data/fan-accounts.yaml
+data/state.yaml
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# --- editor / OS cruft ---
+.DS_Store
+.idea/
+.vscode/
+*.swp

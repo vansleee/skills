@@ -1,0 +1,14 @@
+# sent-log.example.yaml
+#
+# Seeded/empty on purpose. The real sent-log.yaml is gitignored and
+# populated by `tools.py record-sent` over time.
+#
+# Schema (one entry per list item):
+#   date:      YYYY-MM-DD (required)
+#   url:       canonical URL of the video (required, dedupe key)
+#   handle:    poster account handle, no leading @ (required)
+#   platform:  tiktok | youtube | instagram | threads (required)
+#   country:   ISO-like two-letter code, e.g. KR / TW / JP (optional)
+#   opener:    the opener phrase used that day (optional, aids pick-opener)
+
+[]

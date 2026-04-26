@@ -1,0 +1,24 @@
+# OS
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+
+# Claude local settings (personal permissions, not shared)
+.claude/settings.local.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# Editor
+.idea/
+.vscode/
+*.swp
+*.swo

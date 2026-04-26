@@ -1,0 +1,13 @@
+# daily-missing-juenu runtime state.
+#
+# Tracked automatically — you shouldn't normally edit this by hand.
+# Gitignored; copy the .example to state.yaml on first install (or just
+# let tools.py mark-run-complete create it).
+#
+# Fields:
+#   last_run_at:     ISO-8601 datetime of the most recent successful draft.
+#                    Used as the "since" filter for the next run so we
+#                    don't re-pick videos posted before this time.
+#                    null = no run yet, fall back to --default-since.
+
+last_run_at: null

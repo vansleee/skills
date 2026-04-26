@@ -1,0 +1,95 @@
+# fan-accounts.example.yaml
+#
+# Seed watchlist of public fan accounts. The real fan-accounts.yaml is
+# gitignored — it evolves locally over time as hit_count and last_seen
+# change. This example lists only the handles; rename to fan-accounts.yaml
+# on first install and customize freely.
+#
+# Schema:
+#   handle:     account handle, no leading @ (required, dedupe key)
+#   platform:   tiktok | youtube | instagram | threads (required)
+#   country:    ISO-like two-letter code (optional)
+#   hit_count:  how many times a post from this account was included (int)
+#   last_seen:  most recent hit date, YYYY-MM-DD (null if never)
+#   active:     include in list-accounts results when --active is set
+#   notes:      free-form (optional)
+
+- handle: cheer_leader_tv
+  platform: tiktok
+  country: KR
+  hit_count: 0
+  last_seen: null
+  active: true
+  notes: null
+
+- handle: chikorean
+  platform: tiktok
+  country: KR
+  hit_count: 0
+  last_seen: null
+  active: true
+  notes: null
+
+- handle: huykorean
+  platform: tiktok
+  country: KR
+  hit_count: 0
+  last_seen: null
+  active: true
+  notes: null
+
+- handle: soondoungy
+  platform: tiktok
+  country: KR
+  hit_count: 0
+  last_seen: null
+  active: true
+  notes: null
+
+- handle: duoayo
+  platform: tiktok
+  country: KR
+  hit_count: 0
+  last_seen: null
+  active: true
+  notes: null
+
+- handle: cannon.shooter
+  platform: tiktok
+  country: KR
+  hit_count: 0
+  last_seen: null
+  active: true
+  notes: null
+
+- handle: taiwan_cheer_tv
+  platform: tiktok
+  country: TW
+  hit_count: 0
+  last_seen: null
+  active: true
+  notes: null
+
+- handle: kkisgood
+  platform: youtube
+  country: null
+  hit_count: 0
+  last_seen: null
+  active: true
+  notes: null
+
+- handle: '0724.32'
+  platform: instagram
+  country: null
+  hit_count: 0
+  last_seen: null
+  active: true
+  notes: null
+
+- handle: chang_cheervision
+  platform: instagram
+  country: TW
+  hit_count: 0
+  last_seen: null
+  active: true
+  notes: null
