@@ -1,0 +1,17 @@
+{
+  "skill": "pytest-benchmark-runner",
+  "evals": [
+    {
+      "id": "three-run-baseline",
+      "prompt": "Run the affected pytest test three times and summarize the baseline",
+      "expected_output": "A benchmark summary with command, runs, pass rate, durations, and failure signatures",
+      "assertions": [
+        "Uses run_pytest_benchmark.py",
+        "Runs the requested selector three times",
+        "Reports pass rate and per-run exit codes",
+        "Extracts failure signatures when tests fail",
+        "Reports environment or dependency blockers if pytest cannot run"
+      ]
+    }
+  ]
+}

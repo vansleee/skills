@@ -1,0 +1,17 @@
+{
+  "skill": "selenium-best-practices-review",
+  "evals": [
+    {
+      "id": "review-flaky-page-object",
+      "prompt": "Review this Selenium page object and tests for flakiness",
+      "expected_output": "Severity-ordered review findings with impact and verification",
+      "assertions": [
+        "Leads with findings",
+        "Flags sleeps, brittle locators, and broad exceptions when present",
+        "Explains reliability impact",
+        "Suggests minimal fixes",
+        "Includes pytest verification guidance"
+      ]
+    }
+  ]
+}

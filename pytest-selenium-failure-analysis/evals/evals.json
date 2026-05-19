@@ -1,0 +1,27 @@
+{
+  "skill": "pytest-selenium-failure-analysis",
+  "evals": [
+    {
+      "id": "timeout-analysis",
+      "prompt": "Analyze this pytest Selenium TimeoutException from CI",
+      "expected_output": "Failure analysis with classification, evidence, confidence, and next step",
+      "assertions": [
+        "Classifies the failure instead of immediately editing code",
+        "Identifies the first real failure when multiple failures appear",
+        "Uses Selenium exception details as evidence",
+        "States confidence and missing evidence",
+        "Does not recommend skipping the test as the primary fix"
+      ]
+    },
+    {
+      "id": "local-ci-disagreement",
+      "prompt": "CI is green but this Selenium suite fails locally. What is happening?",
+      "expected_output": "Analysis that compares local and CI execution conditions",
+      "assertions": [
+        "Considers parallelism, fixture isolation, browser/session reuse, and environment differences",
+        "Does not assume green CI means tests are healthy",
+        "Recommends evidence to collect before changing code"
+      ]
+    }
+  ]
+}

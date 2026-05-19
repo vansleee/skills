@@ -1,0 +1,41 @@
+{
+  "skill": "pytest-selenium-test-improvement",
+  "evals": [
+    {
+      "id": "flaky-test-fix",
+      "prompt": "Fix the flaky Selenium pytest in TEST_IMPROVEMENT_TRACKER.md",
+      "expected_output": "A small verified test change with baseline and after evidence recorded",
+      "assertions": [
+        "Selects one tracker item before editing",
+        "Identifies affected pytest selectors",
+        "Runs or asks to run a 3-run baseline before changing code",
+        "Does not skip the test or weaken assertions",
+        "Runs the same affected tests 3 times after the change",
+        "Updates tracker status and benchmark fields"
+      ]
+    },
+    {
+      "id": "unknown-failure",
+      "prompt": "This Selenium test times out. Figure out what to fix.",
+      "expected_output": "A diagnosis-first workflow that gathers failure evidence before changing code",
+      "assertions": [
+        "Collects pytest output and Selenium exception details",
+        "Classifies the failure before proposing a fix",
+        "Uses explicit wait or locator guidance when relevant",
+        "States confidence and missing evidence",
+        "Avoids broad sleeps and global timeout increases as the first fix"
+      ]
+    },
+    {
+      "id": "pr-summary",
+      "prompt": "Generate PR notes for the completed test improvement",
+      "expected_output": "A structured PR summary grounded in tracker and benchmark evidence",
+      "assertions": [
+        "Includes summary, verification, reliability notes, risk, and rollback sections",
+        "Mentions baseline and after commands",
+        "Does not claim broader coverage than the affected tests prove",
+        "Does not imply a commit was made unless requested"
+      ]
+    }
+  ]
+}

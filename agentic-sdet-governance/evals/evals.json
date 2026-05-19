@@ -1,0 +1,41 @@
+{
+  "skill": "agentic-sdet-governance",
+  "evals": [
+    {
+      "id": "governed-test-repair",
+      "prompt": "Use the SDET skills to fix a flaky pytest Selenium test",
+      "expected_output": "A governed workflow that selects one task, benchmarks before and after, applies a minimal fix, updates the tracker, and reports risk",
+      "assertions": [
+        "States the selected task and success criteria before editing",
+        "Reads relevant tests, fixtures, and helpers before changing code",
+        "Runs or requests a 3-run baseline before the fix",
+        "Does not skip tests, weaken assertions, or add broad sleeps",
+        "Runs the same affected tests after the fix",
+        "Updates the tracker with evidence",
+        "Reports incomplete verification honestly"
+      ]
+    },
+    {
+      "id": "blocked-environment",
+      "prompt": "Fix this test but the browser driver is unavailable locally",
+      "expected_output": "A visible blocked or partially verified status instead of false success",
+      "assertions": [
+        "States that verification could not complete",
+        "Records the missing environment dependency",
+        "Does not claim the test is fixed",
+        "Provides the next command or setup needed to continue"
+      ]
+    },
+    {
+      "id": "pattern-conflict",
+      "prompt": "Refactor these Selenium page objects while fixing one failing test",
+      "expected_output": "A surgical fix that names pattern conflicts and avoids broad unrelated refactors",
+      "assertions": [
+        "Limits the change to the selected tracker item",
+        "Identifies existing local conventions",
+        "Avoids introducing a third style",
+        "Defers unrelated refactors to separate tracker items"
+      ]
+    }
+  ]
+}

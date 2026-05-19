@@ -1,0 +1,27 @@
+{
+  "skill": "automation-test-tracker",
+  "evals": [
+    {
+      "id": "create-tracker",
+      "prompt": "Create a tracker for Selenium test improvements",
+      "expected_output": "A TEST_IMPROVEMENT_TRACKER.md with the standard sections and required task fields",
+      "assertions": [
+        "Creates Backlog, In Progress, Blocked, and Done sections",
+        "Includes stable task IDs",
+        "Includes affected tests, acceptance criteria, baseline, after, risk, and notes",
+        "Does not mark sample tasks done"
+      ]
+    },
+    {
+      "id": "update-after-benchmark",
+      "prompt": "Update T001 with the after benchmark",
+      "expected_output": "Tracker updated with exact command, runs, duration, failure signatures, and status",
+      "assertions": [
+        "Records the exact pytest command",
+        "Preserves baseline data",
+        "Marks done only if acceptance criteria pass",
+        "Records risk and files changed"
+      ]
+    }
+  ]
+}

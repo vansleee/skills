@@ -25,7 +25,7 @@ cp data/sent-log.example.yaml data/sent-log.yaml
 **Run tests:**
 ```bash
 cd daily-missing-juenu
-python -m unittest discover -s tests -v
+python3 -m unittest discover -s tests -v
 ```
 
 **Run one test module:**
@@ -73,3 +73,48 @@ tests/              — stdlib unittest; safe to run anytime (temp files, no net
 - URLs are canonical dedupe keys
 
 Full workflow details: `daily-missing-juenu/SKILL.md`
+
+### agentic-sdet-governance
+
+Governance rules for Agentic SDET workflows. Use as the control layer before multi-step automation-test repair work. It enforces read-before-write, one tracker item at a time, baseline/after verification, explicit checkpoints, no skipped tests, no weakened assertions, no silent failures, and human-in-loop boundaries.
+
+### pytest-selenium-test-improvement
+
+Human-in-loop workflow for improving pytest + Selenium automation tests. Uses tracker tasks, 3-run baseline benchmarks, minimal fixes, 3-run after benchmarks, tracker updates, and optional PR summaries.
+
+Key resources:
+- `pytest-selenium-test-improvement/SKILL.md`
+- `pytest-selenium-test-improvement/references/pytest-selenium-guidelines.md`
+- `pytest-selenium-test-improvement/assets/tracker-template.md`
+- `pytest-selenium-test-improvement/evals/evals.json`
+
+### pytest-selenium-failure-analysis
+
+Diagnoses pytest + Selenium failures from pytest output, Selenium exceptions, screenshots, browser logs, CI logs, and reruns. Outputs classification, evidence, confidence, likely root cause, and next step.
+
+### automation-test-tracker
+
+Maintains `TEST_IMPROVEMENT_TRACKER.md` using stable task IDs, affected tests, baseline/after benchmarks, risk, and status sections.
+
+### selenium-best-practices-review
+
+Reviews Selenium tests, page objects, fixtures, locators, waits, retries, and isolation for reliability risks.
+
+### pytest-benchmark-runner
+
+Runs pytest selectors repeatedly and summarizes pass rate, durations, exit codes, and failure signatures.
+
+Run tests:
+```bash
+cd pytest-benchmark-runner
+python3 -m unittest discover -s tests -v
+```
+
+Run benchmark:
+```bash
+python3 pytest-benchmark-runner/scripts/run_pytest_benchmark.py --runs 3 -- tests/e2e/test_login.py -q
+```
+
+### automation-pr-summary
+
+Creates structured PR descriptions for automation-test improvements using tracker entries, diffs, and before/after benchmark evidence.

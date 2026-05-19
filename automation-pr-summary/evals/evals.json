@@ -1,0 +1,17 @@
+{
+  "skill": "automation-pr-summary",
+  "evals": [
+    {
+      "id": "completed-test-fix",
+      "prompt": "Write a PR summary for this completed Selenium test improvement",
+      "expected_output": "A structured PR body grounded in tracker and benchmark evidence",
+      "assertions": [
+        "Includes Summary, Verification, Reliability Notes, Risk, and Follow-up",
+        "Mentions baseline and after commands",
+        "Mentions x/3 passing results",
+        "Does not overclaim coverage",
+        "Mentions missing verification if any"
+      ]
+    }
+  ]
+}

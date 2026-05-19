@@ -7,6 +7,13 @@ Personal collection of Claude Code skills. Each skill is a self-contained subdir
 | Skill | Description |
 |-------|-------------|
 | [daily-missing-juenu](daily-missing-juenu/) | Daily digest of 李珠珢 fan videos → Slack draft (never auto-sends) |
+| [agentic-sdet-governance](agentic-sdet-governance/) | Governance rules for Agentic SDET workflows and automation-test skills |
+| [pytest-selenium-test-improvement](pytest-selenium-test-improvement/) | Human-in-loop workflow for improving pytest + Selenium tests with baseline/after benchmarks |
+| [pytest-selenium-failure-analysis](pytest-selenium-failure-analysis/) | Diagnose pytest + Selenium failures from logs, traces, screenshots, and reruns |
+| [automation-test-tracker](automation-test-tracker/) | Maintain `TEST_IMPROVEMENT_TRACKER.md` for automation-test repair work |
+| [selenium-best-practices-review](selenium-best-practices-review/) | Review Selenium test code for reliability and maintainability issues |
+| [pytest-benchmark-runner](pytest-benchmark-runner/) | Run pytest selectors repeatedly and summarize pass rate, duration, and failures |
+| [automation-pr-summary](automation-pr-summary/) | Generate structured PR summaries for automation-test improvements |
 
 ## Structure convention
 
