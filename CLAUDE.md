@@ -118,3 +118,32 @@ python3 pytest-benchmark-runner/scripts/run_pytest_benchmark.py --runs 3 -- test
 ### automation-pr-summary
 
 Creates structured PR descriptions for automation-test improvements using tracker entries, diffs, and before/after benchmark evidence.
+
+### how
+
+Explains how a subsystem, feature, or flow works in **product source code**, at the level of a senior engineer onboarding. Adapted from [poteto/how](https://github.com/poteto/how). Two modes: Explain (default — Overview / Key Concepts / How It Works / Where Things Live / Gotchas) and Critique (spawns parallel critics against an architectural rubric). Complex questions fan out into 2–4 parallel explorer subagents, then a synthesis pass.
+
+Trigger: "how does X work", "walk me through Y", "explain the architecture of Z". Add "also critique" for the review pass.
+
+Layout:
+```
+how/
+├── SKILL.md
+└── references/
+    ├── explainer-prompt.md
+    ├── explorer-prompt.md
+    ├── critic-prompt.md
+    └── critique-rubric.md
+```
+
+### how-to-test
+
+Sibling of `how`, targeted at **test code** — pytest + Selenium E2E and integration / API test repos. Output emphasizes test architecture (conftests, fixtures, page objects / API clients, helpers, test data, runner config) and reliability/maintainability gotchas. Critique mode runs exactly two critics in parallel: **Reliability** (flakiness, hidden waits, isolation, retry behavior, env coupling) and **Maintainability** (page object discipline, locator strategy, fixture sprawl, naming).
+
+Hard prohibitions in critique findings (per `agentic-sdet-governance`): never recommend `time.sleep`, broader retries, skips/xfails, weakened assertions, swallowed exceptions, or wholesale rewrites.
+
+Trigger: "how does this test work", "walk me through the fixtures", "explain the page object layer", "how is the test data set up". Add "also critique" for the review pass.
+
+Wires (points the user at, never invokes): `pytest-selenium-test-improvement`, `selenium-best-practices-review`, `pytest-selenium-failure-analysis`, `pytest-benchmark-runner`, `automation-test-tracker`, `automation-pr-summary`, `agentic-sdet-governance`.
+
+Layout: same as `how/` above.
