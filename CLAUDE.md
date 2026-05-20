@@ -6,6 +6,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Collection of personal Claude skills — each skill is a self-contained subdirectory with its own `SKILL.md` (workflow), `README.md` (setup), `scripts/`, `tests/`, `config.example.yaml`, and `data/`.
 
+## Install / activate skills
+
+Symlink every skill in this repo into `~/.claude/skills/`:
+
+```bash
+./install-skills.sh             # install / refresh (idempotent — safe after git pull)
+./install-skills.sh --dry-run   # preview, change nothing
+./install-skills.sh --uninstall # remove only the symlinks this repo owns
+```
+
+The script auto-discovers any subdir containing a `SKILL.md`. Hand-written files at the target path are preserved (skipped, never overwritten). Open a new Claude Code session after install to pick up the new skills.
+
+Override target with `CLAUDE_SKILLS_DIR=/some/other/path ./install-skills.sh`.
+
 ## Skills
 
 ### daily-missing-juenu
