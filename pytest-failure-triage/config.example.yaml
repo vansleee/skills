@@ -1,0 +1,27 @@
+# pytest-failure-triage configuration
+# Copy to config.yaml and adjust for your environment (config.yaml is gitignored)
+
+jira:
+  base_url: "https://jira.example.com"   # TODO: replace with your JIRA URL
+  project_key: "PROJ"                    # TODO: project where triage tickets are filed
+  issue_type: "Bug"
+  auth: "env:JIRA_API_TOKEN"
+  labels:
+    - pytest-triage
+    - auto-created
+
+ownership:
+  # test path pattern (glob) -> owner name; earlier entries win
+  owner_map:
+    # "tests/e2e/login/**": "alice"
+    # "tests/e2e/checkout/**": "bob"
+  # owner name -> JIRA username / accountId
+  jira_account_map:
+    # "alice": "alice.chen"
+    # "bob": "bob.wang"
+  # when owner_map has no match, infer the owner via git history
+  # (author with the most commits to the test file in the last year)
+  fallback_git_blame: true
+
+dedupe:
+  jql_template: 'project = {project_key} AND labels = pytest-triage AND summary ~ "{test_file}" AND statusCategory != Done'

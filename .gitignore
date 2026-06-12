@@ -22,3 +22,6 @@ venv/
 .vscode/
 *.swp
 *.swo
+
+# Skill local configs (copy from config.example.yaml)
+pytest-failure-triage/config.yaml
