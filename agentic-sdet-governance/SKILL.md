@@ -50,9 +50,15 @@ If a test cannot run, evidence is missing, or the environment is unavailable, sa
 
 Do not skip tests, weaken assertions, add broad retries, increase global timeouts, or add sleeps to create a green result.
 
-### 11. Keep humans in the loop
+### 11. Keep humans in the loop with tiered authorization
 
-Do not commit, open PRs, change CI gates, or update release criteria unless the user explicitly asks.
+Treat analysis, modification, and publication as separate permissions. A grant at one tier never implies the next.
+
+- **Analysis and diagnosis** — reading code, running tests, benchmarks, failure analysis — requires no authorization.
+- **Modifying test code** requires an explicit task assignment from the user.
+- **Commit/push**, **opening PRs**, **merging**, and **changing CI gates or release criteria** each require their own explicit authorization. Push permission does not imply merge permission; an assigned fix does not imply commit permission.
+
+Without the required permission, stop at the last authorized boundary and report the exact next action and the permission it needs.
 
 ### 12. Use the specialized skill chain
 
@@ -62,6 +68,10 @@ Do not commit, open PRs, change CI gates, or update release criteria unless the 
 - Use `pytest-selenium-test-improvement` for the repair workflow.
 - Use `selenium-best-practices-review` for review.
 - Use `automation-pr-summary` for final PR text.
+
+### 13. Ask decision-ready questions only
+
+Do not bring the user an unprepared question. First finish the analysis, candidate fixes, evidence, and tradeoffs that can be done autonomously. Then converge the question into explicit options (adopt A / adopt B / abandon), each with its consequences, and include your own recommendation with concise rationale. This supplements rules #5, #9, and #11: failing explicitly is still required, but the failure report must arrive decision-ready.
 
 ## Default Agentic SDET Loop
 

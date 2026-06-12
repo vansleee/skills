@@ -23,6 +23,19 @@ Create concise, evidence-backed PR text for automation test changes.
 - Do not say a commit or PR exists unless it actually exists.
 - Mention missing verification honestly.
 
+## Owner Decision Brief
+
+Whenever the summary mentions any ticket or PR, print its full canonical clickable URL (e.g. `https://github.com/OWNER/REPO/pull/123`, `https://jira.example.com/browse/NPLAN-1234`). Never use only a bare number such as `#123` or `NPLAN-1234`.
+
+For every open decision the PR leaves to the reviewer or owner, include:
+
+- what changed and who benefits, in plain language;
+- why the decision is needed now;
+- completed evidence: baseline/after benchmarks, reruns, CI state, live proof if applicable;
+- material tradeoffs and residual risks;
+- your recommendation with concise rationale;
+- the explicit options available and what each one does.
+
 ## Output
 
 Keep the result ready to paste into a PR body or commit description.
