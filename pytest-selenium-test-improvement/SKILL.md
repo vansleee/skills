@@ -63,6 +63,15 @@ If asked for PR text, use `assets/pr-summary-template.md` or the `automation-pr-
 - Preserve isolation; avoid shared mutable browser state between tests.
 - Keep raw evidence available when failures are ambiguous.
 
+## Live Proof Gate
+
+A repaired test counts as healed only after it re-runs and passes in the real target environment — the environment the suite actually runs against (CI, real grid, staging).
+
+- Local passes and mock-based passes are supplementary evidence only; they never replace the live re-run.
+- Re-run the live proof after every change that touches a relevant runtime path, even if an earlier run was green.
+- Never infer from any other authorization or instruction that the proof may be skipped; only the user can grant an explicit, item-specific waiver.
+- If the target environment is unavailable, finish all autonomous work (fix, local evidence, tracker update), then stop and explicitly request access or a waiver. Do not mark the item done.
+
 ## Resources
 
 - `references/pytest-selenium-guidelines.md` for locator, wait, fixture, and assertion guidance.
