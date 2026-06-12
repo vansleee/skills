@@ -106,6 +106,20 @@ Key resources:
 
 Diagnoses pytest + Selenium failures from pytest output, Selenium exceptions, screenshots, browser logs, CI logs, and reruns. Outputs classification, evidence, confidence, likely root cause, and next step.
 
+### pytest-failure-triage
+
+Triages failed tests from a pytest report (JUnit XML preferred, pytest console output, or pytest-html — local path or URL, e.g. from a Jenkins/CI run): parses failures, resolves owners (config `owner_map` globs → git blame fallback → unassigned), groups one JIRA ticket per owner with dedupe-before-create and idempotent reruns, and delegates RCA to `pytest-selenium-failure-analysis`. Trigger: `/triage-report <report_path_or_url>`.
+
+**Setup (first time):**
+```bash
+cd pytest-failure-triage
+cp config.example.yaml config.yaml
+# edit config.yaml: jira.base_url, jira.project_key, ownership.owner_map
+export JIRA_API_TOKEN=...   # never stored in config
+```
+
+Key conventions: user confirmation required before any JIRA API side effect; tickets reference full clickable URLs (never bare keys); Autonomous-queue items are handed to `pytest-selenium-test-improvement` under `agentic-sdet-governance` authorization tiers.
+
 ### automation-test-tracker
 
 Maintains `TEST_IMPROVEMENT_TRACKER.md` using stable task IDs, affected tests, baseline/after benchmarks, risk, and status sections.
