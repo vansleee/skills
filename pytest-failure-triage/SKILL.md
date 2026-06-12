@@ -14,17 +14,17 @@ description: >
 
 Usage: `/triage-report <report_path_or_url>`
 
-接受的輸入（擇一，優先序由上而下）:
+Accepted inputs (any one, in priority order):
 
-1. **JUnit XML**（`--junitxml` 產物）— 結構最完整，優先使用。
-2. **pytest console output**（CI console log 或本地輸出的文字檔）。
-3. **pytest-html report**（`--html` 產物）。
+1. **JUnit XML** (`--junitxml` output) — most structured, prefer this.
+2. **pytest console output** (CI console log or a saved text file).
+3. **pytest-html report** (`--html` output).
 
-輸入可以是本地路徑或 URL。URL 用 `curl -s` 下載到 `/tmp/triage/` 再解析 — 不要用 WebFetch 抓內網 HTTP server（會被強制升級 HTTPS 而失敗）。
+The input can be a local path or a URL. Download URLs with `curl -s` into `/tmp/triage/` before parsing — do not use WebFetch for intranet HTTP servers (it force-upgrades to HTTPS and fails).
 
 ## Configuration
 
-讀取 skill 目錄下的 `config.yaml`（若存在），否則使用 `config.example.yaml` 的預設值。第一次執行若缺少必要設定，先向使用者確認再繼續：
+Read `config.yaml` in the skill directory if it exists; otherwise fall back to the defaults in `config.example.yaml`. On first run, confirm any missing required settings with the user before continuing:
 
 ```yaml
 jira:
@@ -34,11 +34,11 @@ jira:
   auth: "env:JIRA_API_TOKEN"   # Bearer token from env var; never ask the user to paste it in chat
   labels: ["pytest-triage", "auto-created"]
 ownership:
-  # 測試路徑 pattern（glob）→ owner 名稱；越前面優先
+  # test path pattern (glob) -> owner name; earlier entries win
   owner_map: {}
-  # owner 名稱 → JIRA username / accountId（查不到時 ticket 留 unassigned 並在描述註明）
+  # owner name -> JIRA username / accountId (if missing, leave the ticket unassigned and note it in the description)
   jira_account_map: {}
-  # owner_map 查不到時是否用 git blame 推測（取該測試檔案多數作者）
+  # when owner_map has no match, infer the owner via git history (majority author of the test file)
   fallback_git_blame: true
 dedupe:
   jql_template: 'project = {project_key} AND labels = pytest-triage AND summary ~ "{test_file}" AND statusCategory != Done'
@@ -48,102 +48,102 @@ dedupe:
 
 ### Step 1 — Collect the report
 
-- 本地路徑直接讀；URL 用 `curl -s <url> -o /tmp/triage/report.<ext>`。
-- 自動判斷格式：XML 以 `<testsuite` 開頭 → JUnit；HTML → pytest-html；其餘當 console output。
-- 先 `head` 看實際結構再寫解析，不要假設欄位。
+- Read local paths directly; download URLs with `curl -s <url> -o /tmp/triage/report.<ext>`.
+- Auto-detect the format: content starting with `<testsuite` → JUnit XML; HTML → pytest-html; anything else → console output.
+- `head` the file to inspect the actual structure before writing the parser; do not assume field order.
 
 ### Step 2 — Parse failures
 
-寫一個小腳本到 `/tmp/triage/parse_report.py`，輸出 JSON 到 `/tmp/triage/failures.json`，後續步驟都吃這份 JSON。每筆 failure 至少取得：
+Write a small script to `/tmp/triage/parse_report.py` that emits JSON to `/tmp/triage/failures.json`; every later step consumes that JSON. For each failure collect at least:
 
 | Field | Source |
 |-------|--------|
-| nodeid | `file::class::test` 完整路徑 |
-| test_file | nodeid 的檔案部分（owner 對應與查重的 key） |
-| outcome | failed / error / skipped（error 含 collection error）|
-| error_type | exception class（如 `TimeoutException`、`AssertionError`）|
-| message | 失敗訊息第一行 |
-| traceback | 完整 traceback（餵給 RCA 用）|
-| duration | 秒數（若有）|
+| nodeid | full `file::class::test` path |
+| test_file | file part of the nodeid (key for owner mapping and dedupe) |
+| outcome | failed / error / skipped (error includes collection errors) |
+| error_type | exception class (e.g. `TimeoutException`, `AssertionError`) |
+| message | first line of the failure message |
+| traceback | full traceback (fed to RCA) |
+| duration | seconds, if available |
 
-統計欄（total / passed / failed / error / skipped）一併輸出。collection error（total 計不到的檔案）標 WARNING。
+Also emit run totals (total / passed / failed / error / skipped). Flag collection errors (files with no counted tests) as WARNING.
 
 ### Step 3 — Resolve owners
 
-對每個 failed/error 的 test_file 決定 owner，依序：
+For each failed/error test_file, resolve the owner in order:
 
-1. `ownership.owner_map` 的 glob pattern 比對（第一個命中為準）。
-2. 若 `fallback_git_blame: true` 且該檔案在 git repo 內：`git log --format=%an -- <file>` 取近一年 commit 數最多的作者。
-3. 都查不到 → owner = `unassigned`，並在 ticket 與最終報告標註「⚠ owner mapping missing: <file>」。
+1. Match `ownership.owner_map` glob patterns (first match wins).
+2. If `fallback_git_blame: true` and the file is inside a git repo: `git log --format=%an -- <file>`, take the author with the most commits in the last year.
+3. Otherwise owner = `unassigned`, and flag "⚠ owner mapping missing: <file>" in both the ticket and the final report.
 
-### Step 4 — Root cause analysis（delegate）
+### Step 4 — Root cause analysis (delegate)
 
-對每筆 failure 呼叫 **`pytest-selenium-failure-analysis`** skill：餵入 nodeid、error_type、message、traceback（必要時附 screenshot / browser log 路徑），取回：
+For each failure, invoke the **`pytest-selenium-failure-analysis`** skill with the nodeid, error_type, message, and traceback (plus screenshot / browser log paths when available), and collect:
 
-- 失敗分類（locator / wait-timing / assertion mismatch / test data / fixture isolation / environment / product regression / cascade / unknown）
-- queue 分類（Autonomous / Needs owner / Ignored）
-- likely root cause、confidence、建議的最小下一步
+- failure classification (locator / wait-timing / assertion mismatch / test data / fixture isolation / environment / product regression / cascade / unknown)
+- queue category (Autonomous / Needs owner / Ignored)
+- likely root cause, confidence, and the smallest recommended next step
 
-同一 error signature 的多筆 failure 可合併分析一次，避免重複工作。RCA 結果回填到 Step 5 的 ticket 描述。
+Failures sharing the same error signature may be analyzed once as a group to avoid duplicate work. Feed the RCA results into the ticket descriptions in Step 5.
 
 ### Step 5 — Create or update JIRA tickets
 
-依 owner 分組，同一位 owner 的多個失敗收在**同一張** ticket（一個 owner 一張），避免洗版。
+Group failures by owner; all failures for one owner go into **a single ticket** (one ticket per owner) to avoid flooding the project.
 
-**先查重再建單。** 對每個 owner group：
+**Dedupe before creating.** For each owner group:
 
-1. 用 `dedupe.jql_template` 搜尋既有未關閉 ticket：
+1. Search for an existing open ticket using `dedupe.jql_template`:
    ```
    curl -s -H "Authorization: Bearer $JIRA_API_TOKEN" \
      "<jira_base>/rest/api/2/search?jql=<urlencoded_jql>&fields=key,summary,status"
    ```
-2. **找到既有 ticket → 更新**：add comment 附上本次 run 的失敗清單與 RCA（不要覆寫原描述）。留言前先檢查該 run 是否已留言過（冪等）。
-3. **沒找到 → 建新單**：
+2. **Existing ticket found → update it**: add a comment with this run's failure list and RCA (never overwrite the original description). Before commenting, check whether this run has already been commented (idempotency).
+3. **No match → create a new ticket**:
    ```
    curl -s -X POST -H "Authorization: Bearer $JIRA_API_TOKEN" -H "Content-Type: application/json" \
      "<jira_base>/rest/api/2/issue" -d @/tmp/triage/issue_<owner>.json
    ```
 
-Ticket 內容模板：
+Ticket content template:
 
-- **Summary**: `[Triage][<run_label>] <N> failed tests — <owner>`（run_label 取 CI build 名稱/編號，無則用日期）
-- **Description**（JIRA wiki markup）：
+- **Summary**: `[Triage][<run_label>] <N> failed tests — <owner>` (run_label = CI build name/number, or the date if unavailable)
+- **Description** (JIRA wiki markup):
   ```
   h3. Source
   * Report: <report path/URL>
-  * Run: <CI run URL（若使用者有提供）>
+  * Run: <CI run URL, if the user provided one>
 
   h3. Failed Tests
   || Test || Outcome || Error || Classification || Queue ||
-  | <nodeid> | failed | <error_type>: <message> | <RCA 分類> | Autonomous/Needs owner |
+  | <nodeid> | failed | <error_type>: <message> | <RCA classification> | Autonomous/Needs owner |
 
   h3. RCA
-  <pytest-selenium-failure-analysis 的 root cause、confidence、建議下一步>
+  <root cause, confidence, and recommended next step from pytest-selenium-failure-analysis>
   ```
-- **Assignee**: `jira_account_map[<owner>]`（查無則略過 assignee 欄位）
-- **Labels**: 套用 `jira.labels`
+- **Assignee**: `jira_account_map[<owner>]` (omit the assignee field when unmapped)
+- **Labels**: apply `jira.labels`
 
-建單/留言**屬於對外副作用**：先把要建立的 ticket 清單（owner、summary、failed tests）列給使用者確認，得到同意後才呼叫 JIRA API。
+Creating tickets and commenting are **external side effects**: list the planned tickets (owner, summary, failed tests) to the user for confirmation, and call the JIRA API only after approval.
 
 ### Step 6 — Final report
 
-在對話中輸出 triage 總結（每張 ticket 印完整可點擊 URL，不准只寫 ticket key）：
+Output a triage summary in the conversation (print the full clickable URL for every ticket; never just the ticket key):
 
 | Owner | JIRA Ticket (full URL) | Action (created/updated) | Failed Tests | RCA Classification | Queue |
 |-------|------------------------|--------------------------|---------------|--------------------|-------|
 
-外加：
+Plus:
 
-- ⚠ 無法 mapping 的 owner / 檔案
-- ⚠ collection error 的檔案
-- 同一 run 多筆 failure 出現相同 error signature（如同一個 timeout / 連線錯誤）→ 提醒可能是環境或 stack-wide event，建議合併成單一 infra ticket 而非分派給各 owner
-- queue 為 **Autonomous** 的項目 → 提示可交給 `pytest-selenium-test-improvement` 修復（遵循 `agentic-sdet-governance` 的授權分層，未經授權不動手）
+- ⚠ owners / files that could not be mapped
+- ⚠ files with collection errors
+- multiple failures in the same run sharing one error signature (e.g. the same timeout / connection error) → flag a possible environment or stack-wide event and suggest a single infra ticket instead of assigning to individual owners
+- items queued as **Autonomous** → note they can be handed to `pytest-selenium-test-improvement` for repair (subject to `agentic-sdet-governance` authorization tiers; never start without authorization)
 
-並把報告存檔：`<project-root>/triage-reports/<YYYY-MM-DD>_<run_label>_triage.md`（目錄不存在就建立）。
+Save the report to `<project-root>/triage-reports/<YYYY-MM-DD>_<run_label>_triage.md` (create the directory if missing).
 
 ## Notes
 
-- passed + failed + error + skipped 應等於 total；不相等時在報告標 WARNING。
-- JIRA token 一律從環境變數讀；若未設定，提示使用者設定後重跑，不要在對話中要求貼上 token。
-- 重跑同一份 report 必須是冪等的：查重邏輯保證不會重複開單，重複的 comment 也先檢查是否已存在。
-- RCA 與修復分工：本 skill 只負責 triage 與開單；分析交給 `pytest-selenium-failure-analysis`，修復交給 `pytest-selenium-test-improvement`，全程受 `agentic-sdet-governance` 約束。
+- passed + failed + error + skipped should equal total; flag a WARNING in the report when they differ.
+- Always read the JIRA token from the environment variable; if unset, ask the user to set it and rerun — never ask them to paste a token in chat.
+- Rerunning the same report must be idempotent: the dedupe logic prevents duplicate tickets, and duplicate comments are checked before posting.
+- Division of labor: this skill only triages and files tickets; analysis belongs to `pytest-selenium-failure-analysis`, repair belongs to `pytest-selenium-test-improvement`, and everything is governed by `agentic-sdet-governance`.
