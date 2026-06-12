@@ -1,0 +1,26 @@
+# pytest-failure-triage configuration
+# 複製為 config.yaml 並依實際環境修改後再使用（config.yaml 已被 gitignore）
+
+jira:
+  base_url: "https://jira.example.com"   # TODO: 換成實際 JIRA URL
+  project_key: "PROJ"                    # TODO: triage ticket 要開在哪個 project
+  issue_type: "Bug"
+  auth: "env:JIRA_API_TOKEN"
+  labels:
+    - pytest-triage
+    - auto-created
+
+ownership:
+  # 測試路徑 pattern（glob）→ owner 名稱；越前面優先
+  owner_map:
+    # "tests/e2e/login/**": "alice"
+    # "tests/e2e/checkout/**": "bob"
+  # owner 名稱 → JIRA username / accountId
+  jira_account_map:
+    # "alice": "alice.chen"
+    # "bob": "bob.wang"
+  # owner_map 查不到時用 git blame 推測（取該測試檔近一年 commit 最多的作者）
+  fallback_git_blame: true
+
+dedupe:
+  jql_template: 'project = {project_key} AND labels = pytest-triage AND summary ~ "{test_file}" AND statusCategory != Done'
