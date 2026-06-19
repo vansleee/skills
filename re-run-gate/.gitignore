@@ -1,0 +1,8 @@
+# Live mutable state and audit log — never commit.
+# Example files (data/*.example.yaml) are committed so users have a template.
+data/rerun-state.yaml
+data/gate-log.yaml
+data/gate-log.archive.yaml
+
+# Live config (only the example is committed)
+config.yaml
