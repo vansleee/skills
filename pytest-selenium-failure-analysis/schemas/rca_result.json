@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/vansleee/skills/pytest-selenium-failure-analysis/schemas/rca_result.json",
+  "title": "PytestSeleniumRcaResult",
+  "description": "Structured output of pytest-selenium-failure-analysis when invoked programmatically (e.g. by pytest-failure-triage Step 4). Mirrors the human-facing template in assets/failure-analysis-template.md but adds the queue routing field needed by triage Step 5 and agentic-sdet-governance authorization tiering. Schema is forward-compatible: new optional fields may appear; consumers MUST ignore unknown fields.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "nodeid",
+    "classification",
+    "confidence",
+    "queue",
+    "root_cause",
+    "next_step"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "description": "Bump only on breaking change."
+    },
+    "nodeid": {
+      "type": "string",
+      "description": "Echoed from the input failures.json entry — required for ticket grouping and audit."
+    },
+    "failure_summary": {
+      "type": "string",
+      "description": "One-paragraph plain-language summary. Matches the Failure Summary section of assets/failure-analysis-template.md."
+    },
+    "classification": {
+      "enum": [
+        "locator",
+        "stale_element",
+        "wait_timing",
+        "assertion_mismatch",
+        "test_data",
+        "fixture_isolation",
+        "environment",
+        "product_regression",
+        "cascade",
+        "unknown"
+      ],
+      "description": "One of the categories defined in references/failure-taxonomy.md. snake_case in JSON; human-facing template uses Title Case."
+    },
+    "confidence": {
+      "enum": ["low", "medium", "high"],
+      "description": "Low: significant missing evidence or multiple plausible causes. Medium: one likely cause with caveats. High: cause is reproducible from the evidence at hand."
+    },
+    "queue": {
+      "enum": ["Autonomous", "Needs owner", "Ignored"],
+      "description": "Routing decision used by pytest-failure-triage Step 5 (ticket grouping) and agentic-sdet-governance (authorization tier). Autonomous = safe to hand off to pytest-selenium-test-improvement then re-run-gate. Needs owner = requires human SDET review before any change. Ignored = test/run noise (e.g. cascade after a fixed root failure)."
+    },
+    "evidence": {
+      "type": "array",
+      "items": {"type": "string"},
+      "minItems": 1,
+      "description": "Specific log lines, file paths, screenshot references, or git commits that justify the classification."
+    },
+    "root_cause": {
+      "type": "string",
+      "description": "Concise explanation for a reviewer."
+    },
+    "next_step": {
+      "type": "string",
+      "description": "Smallest concrete action: collect more evidence, file a bug, or hand off to a downstream skill."
+    },
+    "not_recommended": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Tempting-but-unsafe fixes (skips, sleeps, broad retries) that this skill explicitly refuses to recommend. Surfaced to humans so they don't independently re-invent the bad fix."
+    },
+    "missing_evidence": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Evidence that would have raised confidence but was not available. Fed back to pytest-failure-triage for the final report's WARNING section."
+    },
+    "handoff": {
+      "type": "object",
+      "description": "Optional explicit hand-off pointer. When present, supersedes free-text suggestions in recommended_next_step.",
+      "additionalProperties": false,
+      "properties": {
+        "to_skill": {
+          "enum": [
+            "pytest-selenium-test-improvement",
+            "re-run-gate",
+            "agentic-sdet-governance",
+            "none"
+          ]
+        },
+        "reason": {"type": "string"}
+      },
+      "required": ["to_skill"]
+    }
+  }
+}

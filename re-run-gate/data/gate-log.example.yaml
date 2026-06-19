@@ -1,0 +1,18 @@
+# Append-only audit log for re-run-gate.
+#
+# Each entry records one decision. Never delete entries. If the file grows large,
+# summarize older entries into data/gate-log.archive.yaml but preserve the originals.
+#
+# Entry schema (every field required):
+#   - timestamp: <ISO datetime>
+#     task_id: <T###>
+#     run_label: <string>
+#     retry_count: <int>            # Value AFTER this decision (post-increment for FAIL_RETRY)
+#     decision: PASS | FAIL_RETRY | ESCALATED
+#     evidence_summary: <string>    # "2/3 green; failed run #1 timeout in test_x"
+#     ticket_key: <JIRA-KEY or null>
+#     benchmark_path: <path>
+#
+# Copy this file to data/gate-log.yaml before first use (the live file is gitignored).
+
+entries: []

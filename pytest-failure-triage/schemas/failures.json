@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/vansleee/skills/pytest-failure-triage/schemas/failures.json",
+  "title": "PytestTriageFailures",
+  "description": "Output of pytest-failure-triage Step 2 (parse failures), persisted at /tmp/triage/failures.json. Consumed by Step 4 RCA delegation to pytest-selenium-failure-analysis and by Step 5 ticket creation. Schema is forward-compatible: new optional fields may appear; consumers MUST ignore unknown fields.",
+  "type": "object",
+  "required": ["schema_version", "run_totals", "failures"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "description": "Bump only on breaking change. Add new optional fields without bumping."
+    },
+    "run_label": {
+      "type": "string",
+      "description": "CI build name/number, or YYYY-MM-DD date if unavailable. Used in JIRA summary and report filename."
+    },
+    "report_source": {
+      "type": "object",
+      "required": ["path_or_url", "format"],
+      "additionalProperties": false,
+      "properties": {
+        "path_or_url": {
+          "type": "string",
+          "description": "Original path or URL of the report (for audit / re-parse)."
+        },
+        "format": {
+          "enum": ["junit-xml", "pytest-console", "pytest-html"],
+          "description": "Auto-detected in Step 1."
+        }
+      }
+    },
+    "run_totals": {
+      "type": "object",
+      "required": ["total", "passed", "failed", "error", "skipped"],
+      "additionalProperties": false,
+      "description": "passed + failed + error + skipped should equal total; mismatch produces a warning entry.",
+      "properties": {
+        "total": {"type": "integer", "minimum": 0},
+        "passed": {"type": "integer", "minimum": 0},
+        "failed": {"type": "integer", "minimum": 0},
+        "error": {"type": "integer", "minimum": 0},
+        "skipped": {"type": "integer", "minimum": 0}
+      }
+    },
+    "failures": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/failure"}
+    },
+    "warnings": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Collection errors, count mismatches, files with no counted tests, missing owner mappings (filled in Step 3), etc."
+    }
+  },
+  "$defs": {
+    "failure": {
+      "type": "object",
+      "required": ["nodeid", "test_file", "outcome", "error_type", "message", "traceback", "duration"],
+      "additionalProperties": false,
+      "properties": {
+        "nodeid": {
+          "type": "string",
+          "description": "Full pytest nodeid: file::class::test or file::test. Stable identifier across runs."
+        },
+        "test_file": {
+          "type": "string",
+          "description": "File-only portion of nodeid. Key used by ownership.owner_map glob matching and JIRA dedupe."
+        },
+        "outcome": {
+          "enum": ["failed", "error", "skipped"],
+          "description": "error includes collection errors."
+        },
+        "error_type": {
+          "type": "string",
+          "description": "Exception class name, e.g. TimeoutException, AssertionError, NoSuchElementException."
+        },
+        "message": {
+          "type": "string",
+          "description": "First line of failure message — short, used in JIRA summary table."
+        },
+        "traceback": {
+          "type": "string",
+          "description": "Full traceback. Fed verbatim to pytest-selenium-failure-analysis in Step 4."
+        },
+        "duration": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Seconds, if the report provides it."
+        },
+        "artifacts": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Paths to evidence the RCA skill needs. When parsing pytest-html or JUnit reports with attachments, fill these in.",
+          "properties": {
+            "screenshot": {"type": "string"},
+            "html_dump": {"type": "string"},
+            "browser_log": {"type": "string"},
+            "video": {"type": "string"}
+          }
+        },
+        "owner": {
+          "type": "string",
+          "description": "Filled by Step 3 (ownership resolution). 'unassigned' when no mapping found."
+        },
+        "owner_source": {
+          "enum": ["owner_map", "git_blame", "unassigned"],
+          "description": "Filled by Step 3. Records which resolution branch was taken — used in the final report for transparency."
+        }
+      }
+    }
+  }
+}

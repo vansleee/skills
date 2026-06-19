@@ -90,6 +90,8 @@ Failures sharing the same error signature may be analyzed once as a group to avo
 
 Group failures by owner; all failures for one owner go into **a single ticket** (one ticket per owner) to avoid flooding the project.
 
+**Validate RCA input.** Before constructing any ticket description, validate the RCA payload from Step 4 against `pytest-selenium-failure-analysis/schemas/rca_result.json`. Required fields per the schema: `schema_version`, `nodeid`, `classification`, `confidence`, `queue`, `root_cause`, `next_step`. If any required field is missing for a given failure, surface the violation in the final report's WARNING section and skip that failure from ticket creation — do not fabricate fields.
+
 **Dedupe before creating.** For each owner group:
 
 1. Search for an existing open ticket using `dedupe.jql_template`:
@@ -137,7 +139,7 @@ Plus:
 - ⚠ owners / files that could not be mapped
 - ⚠ files with collection errors
 - multiple failures in the same run sharing one error signature (e.g. the same timeout / connection error) → flag a possible environment or stack-wide event and suggest a single infra ticket instead of assigning to individual owners
-- items queued as **Autonomous** → note they can be handed to `pytest-selenium-test-improvement` for repair (subject to `agentic-sdet-governance` authorization tiers; never start without authorization)
+- items queued as **Autonomous** → hand off to `pytest-selenium-test-improvement` for repair (subject to `agentic-sdet-governance` authorization tiers; never start without authorization), then to `re-run-gate` after the improvement finishes (max retries: 3). On escalation, leave the JIRA ticket open and append "escalated: max retries reached" to the triage report
 
 Save the report to `<project-root>/triage-reports/<YYYY-MM-DD>_<run_label>_triage.md` (create the directory if missing).
 

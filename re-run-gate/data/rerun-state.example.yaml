@@ -1,0 +1,17 @@
+# Per-task mutable state for re-run-gate.
+#
+# Structure:
+#   tasks:
+#     <task_id>:
+#       <run_label>:
+#         retry_count: <int>           # Incremented on FAIL_RETRY; never reset.
+#         last_result: <decision>      # PASS | FAIL_RETRY | ESCALATED
+#         last_decided_at: <ISO time>
+#         benchmark_path: <path>       # The file that produced last_result
+#
+# Step 2 of SKILL.md reads this file before any decision; if (task_id, run_label) has
+# a recorded last_result, the call is a duplicate and the gate short-circuits.
+#
+# Copy this file to data/rerun-state.yaml before first use (the live file is gitignored).
+
+tasks: {}

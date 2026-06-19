@@ -1,0 +1,47 @@
+# re-run-gate config — copy to config.yaml and edit. config.yaml is gitignored.
+
+gate:
+  # Minimum green runs (out of total in the benchmark) required for PASS.
+  pass_threshold: 2
+
+  # Maximum FAIL_RETRY iterations before the decision becomes ESCALATED.
+  # retry_count only increments — never resets. This is the loop-stop guarantee.
+  max_retries: 3
+
+  # If the benchmark path matches one of these glob patterns, the gate warns
+  # "Benchmark looks local — Live Proof Gate prefers CI / staging." but proceeds.
+  # Empty list disables the check. Use to enforce Live Proof Gate at the loop level.
+  local_path_warn_patterns:
+    - "**/local-bench/**"
+    - "/Users/**"
+    - "/home/**"
+
+jira:
+  base_url: "https://jira.example.com"
+  # Bearer token from env var; never paste a token in chat or commit it.
+  auth: "env:JIRA_API_TOKEN"
+  # Transition name on PASS (after user confirmation). Must match a transition
+  # actually available on the project's JIRA workflow.
+  close_transition: "Done"
+
+tracker:
+  # Path to TEST_IMPROVEMENT_TRACKER.md relative to the target project root.
+  # re-run-gate invokes automation-test-tracker to do the actual update — it never
+  # edits the file directly.
+  path: "TEST_IMPROVEMENT_TRACKER.md"
+  # Tracker status to set on PASS (after user confirmation).
+  done_status: "done"
+  # Tracker status to set on ESCALATED.
+  blocked_status: "blocked"
+
+triage_report:
+  # Directory where pytest-failure-triage writes its triage reports.
+  # On ESCALATED, re-run-gate appends a single line under the matching report file.
+  dir: "triage-reports"
+
+paths:
+  # Mutable state and audit log live inside the skill directory.
+  # Both are gitignored. Do not move them outside the skill dir without also
+  # updating the .gitignore here and in the consuming repo.
+  state_file: "data/rerun-state.yaml"
+  log_file: "data/gate-log.yaml"
